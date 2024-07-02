@@ -5,7 +5,8 @@ MODELS=( "resnet50_gn_timm" "vitbase_timm" )
 EXP_TYPE="bs1"
 LEVELS=( 5 )
 
-METHODS=( "no_adapt" "poem" "eata" "sar" "tent" )
+# METHODS=( "no_adapt" "poem" "eata" "sar" "tent" "cotta" )
+METHODS=( "cotta" )
 S=2024
 
 for METHOD in ${METHODS[@]}; do

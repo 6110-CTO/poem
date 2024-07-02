@@ -5,7 +5,8 @@ MODELS=( "resnet50_gn_timm" "vitbase_timm" )
 EXP_TYPE="eps_cdf"
 LEVELS=( 1 5 )
 
-METHODS=( "no_adapt" "poem" "eata" "sar" "tent" )
+# METHODS=( "no_adapt" "poem" "eata" "sar" "tent" )
+METHODS=( "no_adapt" "poem" "eata" "sar" "tent" "cotta" )
 S=2024
 N_EXPS=1
 

@@ -10,7 +10,7 @@ EXP_TYPES=( "natural_shift" )
 LEVELS=( 5 )
 LR_FACTORS=( 1 )
 
-METHODS=( "no_adapt" "poem" "eata" "sar" "tent" )
+METHODS=( "no_adapt" "poem" "eata" "sar" "tent" "cotta" )
 S=2024
 
 for METHOD in ${METHODS[@]}; do

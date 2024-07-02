@@ -31,6 +31,7 @@ import torch.nn.functional as F
 import tent
 import eata
 import sar
+from cotta.imagenet import cotta
 import poem
 from sam import SAM
 import timm
@@ -141,7 +142,7 @@ def get_args():
     parser.add_argument('--d_margin', type=float, default=0.05, help='\epsilon in Eqn. (5) for filtering redundant samples')
 
     # Exp Settings
-    parser.add_argument('--method', default='eata', type=str, help='no_adapt, tent, eata, sar')
+    parser.add_argument('--method', default='eata', type=str, help='no_adapt, tent, eata, sar, cotta, poem')
     parser.add_argument('--model', default='resnet50_gn_timm', type=str, help='resnet50_gn_timm or resnet50_bn_torch or vitbase_timm')
     parser.add_argument('--exp_type', default='normal', type=str, help='normal, continual, bs1, in_dist, natural_shift, severity_shift, eps_cdf, martingale')
     parser.add_argument('--cont_size', default=5000, type=int, help='each corruption size for continual type')
@@ -165,7 +166,7 @@ def get_args():
 def get_model(args):
     # build model for adaptation
     bs = args.test_batch_size
-    if args.method in ['tent', 'eata', 'sar', 'no_adapt', 'poem']:
+    if args.method in ['tent', 'eata', 'sar', 'cotta','no_adapt', 'poem']:
         if args.model == "resnet50_gn_timm":
             net = timm.create_model('resnet50_gn', pretrained=True)
             args.lr = (0.00025 / 64) * bs * 2 if bs < 32 else 0.00025
@@ -287,7 +288,7 @@ if __name__ == '__main__':
         bs = args.test_batch_size
         args.print_freq = 50000 // 20 // bs
         
-        if args.method in ['tent', 'eata', 'sar', 'no_adapt', 'poem']:
+        if args.method in ['tent', 'eata', 'sar', 'no_adapt', 'poem', 'cotta']:
             if args.exp_type not in ['mix_shifts', 'continual', 'in_dist', 'severity_shift']:
                 val_dataset, val_loader, holdout_dataset, holdout_loader = prepare_test_data(args, model=dummy_model_for_transorms.model)
         else:
@@ -390,6 +391,14 @@ if __name__ == '__main__':
             run_info['u_before'] = adapt_model.protector.info['u_before']
             run_info['u_after'] = adapt_model.protector.info['u_after']
             run_info['martingales'] = adapt_model.protector.martingales
+        elif args.method == "cotta":
+            net = sar.configure_model(net)
+            params, param_names = sar.collect_params(net)
+            # optimizer = torch.optim.SGD(params, args.lr, momentum=0.9)
+            optimizer = torch.optim.Adam(params, 1e-3 / 64, betas=(0.9, 0.999), weight_decay=0.0)
+
+            adapt_model = cotta.CoTTA(net, optimizer)
+            run_info = run(val_loader, adapt_model, args)
         else:
             assert False, NotImplementedError
 

@@ -8,7 +8,8 @@ EXP_TYPE="severity_shift"
 LEVELS=( 5 )
 LR_FACTORS=( 1 )
 
-METHODS=( "no_adapt" "poem" "eata" "sar" "tent" )
+# METHODS=( "no_adapt" "poem" "eata" "sar" "tent" "cotta" )
+METHODS=( "cotta" )
 
 S=2024
 

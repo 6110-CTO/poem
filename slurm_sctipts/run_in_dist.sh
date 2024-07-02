@@ -7,8 +7,9 @@ EXP_TYPE="in_dist"
 LEVELS=( 5 )
 
 
-# METHODS=( "no_adapt" "poem" "eata" "sar" "tent" )
-METHODS=( "poem" )
+# METHODS=( "no_adapt" "poem" "eata" "sar" "tent" "cotta" )
+METHODS=( "cotta" )
+# METHODS=( "poem" )
 S=2024
 
 for METHOD in ${METHODS[@]}; do

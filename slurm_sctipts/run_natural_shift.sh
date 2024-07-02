@@ -6,8 +6,9 @@ MODELS=( "resnet50_gn_timm" "vitbase_timm" )
 EXP_TYPE="natural_shift"
 LEVELS=( 5 )
 
-# METHODS=( "no_adapt" "poem" "eata" "sar" "tent" )
-METHODS=( "poem" )
+# METHODS=( "no_adapt" "poem" "eata" "sar" "tent" "cotta" )
+METHODS=( "cotta" )
+# METHODS=( "poem" )
 S=2024
 
 for METHOD in ${METHODS[@]}; do
