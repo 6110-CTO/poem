@@ -10,6 +10,7 @@ LEVELS=( 5 )
 # METHODS=( "no_adapt" "poem" "eata" "sar" "tent" "cotta" )
 METHODS=( "cotta" )
 CONT_SIZES=( 100 250 500 1000 2000)
+# CONT_SIZES=( 1000 )
 S=2024
 
 for METHOD in ${METHODS[@]}; do

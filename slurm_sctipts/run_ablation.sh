@@ -1,15 +1,17 @@
 #!/bin/bash
 
-
 MODELS=( "resnet50_gn_timm" "vitbase_timm" )
 
-EXP_TYPE="natural_shift"
+EXP_TYPE="ablation"
 LEVELS=( 5 )
 
 # METHODS=( "no_adapt" "poem" "eata" "sar" "tent" "cotta" )
-METHODS=( "cotta" )
-# METHODS=( "poem" )
+METHODS=( "poem" )
 S=2024
+
+
+
+
 
 for METHOD in ${METHODS[@]}; do
     if [ "$METHOD" == "no_adapt" ]; then
@@ -25,6 +27,7 @@ for METHOD in ${METHODS[@]}; do
         for LEVEL in ${LEVELS[@]}; do
             for MODEL in ${MODELS[@]}; do
                 bash ./sbatch_job.sh "cd .. ; python3 main.py --seed $i --exp_type $EXP_TYPE --model $MODEL --method $METHOD --level $LEVEL --test_batch_size 1"
+                bash ./sbatch_job.sh "cd .. ; python3 main.py --seed $i --exp_type $EXP_TYPE --model $MODEL --method $METHOD --level $LEVEL --test_batch_size 1 --vanilla_loss"
             done
         done
     done

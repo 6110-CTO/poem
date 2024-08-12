@@ -6,7 +6,8 @@ EXP_TYPE="eps_cdf"
 LEVELS=( 1 5 )
 
 # METHODS=( "no_adapt" "poem" "eata" "sar" "tent" )
-METHODS=( "no_adapt" "poem" "eata" "sar" "tent" "cotta" )
+
+METHODS=( "cotta" )
 S=2024
 N_EXPS=1
 

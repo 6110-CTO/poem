@@ -158,6 +158,7 @@ def get_args():
     parser.add_argument('--gamma', type=float, help='protector\'s gamma', default=1 / (8 * sqrt(3)))
     parser.add_argument('--eps_clip', type=float, help='clipping value for epsilon during protection', default=1.80)
     parser.add_argument('--lr_factor', type=float, default=1, help='multiplies the learning rate for poem')
+    parser.add_argument('--vanilla_loss', action='store_false', dest='vanilla_loss', help='Use vanilla match loss (not l match ++).')
 
     return parser.parse_args()
 
@@ -210,7 +211,7 @@ if __name__ == '__main__':
     args.adapt = True
     args.timestamp = time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime())
     args.exp_name = args.timestamp + "--{}-level{}-seed{}".format(args.model, args.level, args.seed) + "_" + str(uuid.uuid4())[:6]
-    output_path = Path(args.output)  / args.method / args.exp_type / args.exp_name
+    output_path = Path(args.output)  / 'imagenet' / args.method / args.exp_type / args.exp_name
     output_path.parent.mkdir(exist_ok=True, parents=True)
     logger.add(f"{output_path}.log")
     
@@ -221,6 +222,9 @@ if __name__ == '__main__':
     if args.exp_type == 'martingale':
         common_corruptions = ['brightness']
         common_corruptions = [item for item in common_corruptions for _ in range(2)]
+
+    if args.exp_type == 'ablation':
+        args.test_batch_size = 1
 
 
     if args.exp_type == 'bs1':
@@ -385,7 +389,7 @@ if __name__ == '__main__':
 
             protector = protect.get_protector_from_ents(info_on_holdout['ents'], args)
             optimizer = torch.optim.SGD(params, args.lr * args.lr_factor, momentum=0.9)
-            adapt_model = poem.POEM(net, optimizer, protector, e0=args.sar_margin_e0, adapt=args.adapt)
+            adapt_model = poem.POEM(net, optimizer, protector, e0=args.sar_margin_e0, adapt=args.adapt, vanilla_loss=args.vanilla_loss)
             run_info = run(val_loader, adapt_model, args)
             run_info['epsilons'] = adapt_model.protector.epsilons
             run_info['u_before'] = adapt_model.protector.info['u_before']
@@ -395,7 +399,15 @@ if __name__ == '__main__':
             net = sar.configure_model(net)
             params, param_names = sar.collect_params(net)
             # optimizer = torch.optim.SGD(params, args.lr, momentum=0.9)
-            optimizer = torch.optim.Adam(params, 1e-3 / 64, betas=(0.9, 0.999), weight_decay=0.0)
+
+            if args.model == "resnet50_gn_timm":
+                args.lr = (1e-3 / 32)
+                # args.temp = 0.875 # timm transforms
+            elif args.model == "vitbase_timm":
+                args.lr = (1e-3 / 16)
+
+            logger.info(f"COTTA LR {args.lr}")
+            optimizer = torch.optim.Adam(params, args.lr, betas=(0.9, 0.999), weight_decay=0.0)
 
             adapt_model = cotta.CoTTA(net, optimizer)
             run_info = run(val_loader, adapt_model, args)

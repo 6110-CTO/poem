@@ -20,7 +20,7 @@ class POEM(nn.Module):
 
     Once tented, a model adapts itself by updating on every forward.
     """
-    def __init__(self, model, optimizer, protector, steps=1, episodic=False, e0=math.log(1000)*0.40, adapt=True, match_plus_plus=True):
+    def __init__(self, model, optimizer, protector, steps=1, episodic=False, e0=math.log(1000)*0.40, adapt=True, vanilla_loss=True):
         super().__init__()
         self.model = model
         self.optimizer = optimizer
@@ -38,7 +38,7 @@ class POEM(nn.Module):
         self.delayed_start = 100
         self.curr_n_samples = 0
         self.adapt = adapt
-        self.match_plus_plus = match_plus_plus
+        self.vanilla_loss = vanilla_loss
 
         # note: if the model is never reset, like for continual adaptation,
         # then skipping the state copy would save memory
@@ -64,7 +64,7 @@ class POEM(nn.Module):
         if self.adapt:
             for _ in range(self.steps):
                 # print(f"step {_}")
-                outputs, loss = forward_and_adapt(x, self.model, self.optimizer, protected_ents, e_margin=self.e0, match_plus_plus=self.match_plus_plus)
+                outputs, loss = forward_and_adapt(x, self.model, self.optimizer, protected_ents, e_margin=self.e0, vanilla_loss=self.vanilla_loss)
             if self.episodic:
                 outputs = self.model(x)
 
@@ -86,7 +86,7 @@ def softmax_entropy(x: torch.Tensor) -> torch.Tensor:
 
 
 @torch.enable_grad()  # ensure grads in possible no grad context for testing
-def forward_and_adapt(x, model, optimizer, protected_ents, e_margin: float = math.log(1000)*0.40, match_plus_plus = True):
+def forward_and_adapt(x, model, optimizer, protected_ents, e_margin: float = math.log(1000)*0.40, vanilla_loss = False):
     """Forward and adapt model on batch of data.
 
     Measure entropy of the model prediction, take gradients, and update params.
@@ -100,7 +100,7 @@ def forward_and_adapt(x, model, optimizer, protected_ents, e_margin: float = mat
     protected_ents = protected_ents.view(-1)
 
 
-    if match_plus_plus:
+    if vanilla_loss:
         filter_ents = torch.where(ents < e_margin)
         ents = ents[filter_ents]
         protected_ents = protected_ents[filter_ents]
