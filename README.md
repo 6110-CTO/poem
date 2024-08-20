@@ -1,9 +1,8 @@
 # Protected Online Entropy Matching (POEM) 🎼🎵🎶
 
 <div style="display: flex; justify-content: space-between;">
-    <img src="figures/synth_exp.svg" alt="Synthetic Experiment" width="30%"/>
-    <img src="figures/martingale.svg" alt="Martingale" width="30%"/>
-    <img src="figures/resnet50_gn_timm_in_dist_with_eps.svg" alt="ResNet50 GN TIMM In-Distribution" width="30%"/>
+    <img src="figures/synth_exp.svg" alt="Synthetic Experiment" width="50%"/>
+    <img src="figures/martingale.svg" alt="Martingale" width="50%"/>
 </div>
 
 Protected Online Entropy Matching (`POEM`) is a novel approach for test-time adaptation via online self-training. The method dynamically updates model parameters based on distribution shifts in the test data entropy, improving robustness while maintaining accuracy and calibration in the absence of shifts.
